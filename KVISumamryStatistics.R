@@ -112,3 +112,33 @@ cust.cnt.threshold=ddply(cust.cnt.less.98, .(div_nm), function(x) round(max(quan
 colnames(cust.cnt.threshold)=c("div_nm","cust_cnt_threshold")
 
 
+##################################################################
+##################################################################
+#ttl sales
+##################################################################
+##################################################################
+densityplot(~ ttl_sales, threshold, pch= 20, plot.points=T)
+
+a=quantile(threshold$ttl_sales, .95)
+ttl_sales.less.98=subset(threshold,threshold$ttl_sales<a)
+
+par(mfrow=c(1,2))
+hist(threshold$ttl_sales,prob=1,breaks=200, main = "cust count impacted, all")
+lines(density(threshold$ttl_sales,kernel="gaussian"),col=2)
+
+hist(ttl_sales.less.98$ttl_sales,prob=1,breaks=100, main = "cust count impacted, 95% low volume")
+lines(density(ttl_sales.less.98$ttl_sales,kernel="gaussian"),col=2)
+
+
+summary(ttl_sales.less.98$ttl_sales)
+
+densityplot(~ ttl_sales | div_nm, ttl_sales.less.98, pch= 20, plot.points=FALSE)
+
+
+#ttl_sales.threshold=ddply(ttl_sales.less.98, .(div_nm), function(x) quantile(x$ttl_sales))
+
+ttl_sales.threshold=ddply(ttl_sales.less.98, .(div_nm), function(x) round(max(quantile(x$ttl_sales,.75),summary(ttl_sales.less.98$ttl_sales)[4]),0))
+colnames(ttl_sales.threshold)=c("div_nm","ttl_sales_threshold")
+
+
+
