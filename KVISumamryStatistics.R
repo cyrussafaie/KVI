@@ -134,11 +134,41 @@ summary(ttl_sales.less.98$ttl_sales)
 
 densityplot(~ ttl_sales | div_nm, ttl_sales.less.98, pch= 20, plot.points=FALSE)
 
-
 #ttl_sales.threshold=ddply(ttl_sales.less.98, .(div_nm), function(x) quantile(x$ttl_sales))
 
 ttl_sales.threshold=ddply(ttl_sales.less.98, .(div_nm), function(x) round(max(quantile(x$ttl_sales,.75),summary(ttl_sales.less.98$ttl_sales)[4]),0))
 colnames(ttl_sales.threshold)=c("div_nm","ttl_sales_threshold")
 
 
+##################################################################
+##################################################################
+#qty_penetration
+##################################################################
+##################################################################
+
+densityplot(~ qty_penetration, threshold, pch= 20, plot.points=T)
+summary(threshold$qty_penetration)
+a.qty_penetration=quantile(threshold$qty_penetration, .98)
+
+
+qty_penetration.less.98=subset(threshold,threshold$qty_penetration<a.qty_penetration)
+
+densityplot(~ qty_penetration, qty_penetration.less.98, pch= 20, plot.points=T)
+
+par(mfrow=c(1,2))
+hist(threshold$qty_penetration,prob=1,breaks=200, main = "qty_penetration impacted, all")
+lines(density(threshold$qty_penetration,kernel="gaussian"),col=2)
+
+hist(qty_penetration.less.98$qty_penetration,prob=1,breaks=100, main = "qty_penetration impacted, 98% low volume")
+lines(density(qty_penetration.less.98$qty_penetration,kernel="gaussian"),col=2)
+
+
+summary(qty_penetration.less.98$qty_penetration)
+
+densityplot(~ qty_penetration | div_nm, qty_penetration.less.98, pch= 20, plot.points=FALSE)
+
+#qty_penetration.threshold=ddply(qty_penetration.less.98, .(div_nm), function(x) quantile(x$qty_penetration))
+#changed to median for qty penetration
+qty_penetration.threshold=ddply(qty_penetration.less.98, .(div_nm), function(x) round(max(quantile(x$qty_penetration,.75),summary(qty_penetration.less.98$qty_penetration)[3]),5))
+colnames(qty_penetration.threshold)=c("div_nm","qty_penetration_threshold")
 
