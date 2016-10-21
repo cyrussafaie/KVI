@@ -242,7 +242,38 @@ colnames(weighted_elasticity.threshold)=c("div_nm","weighted_elasticity_threshol
 
 
 
+##################################################################
+##################################################################
+#psi_cnt
+##################################################################
+##################################################################
 
+densityplot(~ psi_cnt, threshold, pch= 20, plot.points=T)
+summary(threshold$psi_cnt)
+
+a.psi_cnt=quantile(threshold$psi_cnt, .98,na.rm =T)
+
+
+psi_cnt.less.98=subset(threshold,threshold$psi_cnt<10)
+
+densityplot(~ psi_cnt, psi_cnt.less.98, pch= 20, plot.points=T)
+
+par(mfrow=c(1,2))
+hist(threshold$psi_cnt,prob=1,breaks=200, main = "psi_cnt impacted, all")
+lines(density(threshold$psi_cnt,kernel="gaussian"),col=2)
+
+hist(psi_cnt.less.98$psi_cnt,prob=1,breaks=100, main = "psi_cnt impacted, 98% low volume")
+lines(density(psi_cnt.less.98$psi_cnt,kernel="gaussian"),col=2)
+
+
+summary(psi_cnt.less.98$psi_cnt)
+
+densityplot(~ psi_cnt | div_nm, psi_cnt.less.98, pch= 20, plot.points=FALSE)
+
+psi_cnt.threshold=ddply(psi_cnt.less.98, .(div_nm), function(x) quantile(x$psi_cnt,.99))
+#
+
+colnames(psi_cnt.threshold)=c("div_nm","psi_cnt_threshold")
 
 
 
@@ -255,3 +286,5 @@ colnames(weighted_elasticity.threshold)=c("div_nm","weighted_elasticity_threshol
 thresholds.by.market=cbind(qty.threshold,cust.cnt.threshold[,2],ttl_sales.threshold[,2],qty_penetration.threshold[,2],cust_penetration.threshold[,2])
 colnames(thresholds.by.market)=c("div_nm","qty.threshold","cust.cnt.threshold","ttl_sales.threshold","qty_penetration.threshold","cust_penetration.threshold")
 thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(weighted_elasticity.threshold), by = "div_nm")
+thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(psi_cnt.threshold), by = "div_nm")
+
