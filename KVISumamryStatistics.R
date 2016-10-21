@@ -172,3 +172,86 @@ densityplot(~ qty_penetration | div_nm, qty_penetration.less.98, pch= 20, plot.p
 qty_penetration.threshold=ddply(qty_penetration.less.98, .(div_nm), function(x) round(max(quantile(x$qty_penetration,.75),summary(qty_penetration.less.98$qty_penetration)[3]),5))
 colnames(qty_penetration.threshold)=c("div_nm","qty_penetration_threshold")
 
+
+##################################################################
+##################################################################
+#cust_penetration
+##################################################################
+##################################################################
+
+densityplot(~ cust_penetration, threshold, pch= 20, plot.points=T)
+summary(threshold$cust_penetration)
+a.cust_penetration=quantile(threshold$cust_penetration, .98)
+
+
+cust_penetration.less.98=subset(threshold,threshold$cust_penetration<a.cust_penetration)
+
+densityplot(~ cust_penetration, cust_penetration.less.98, pch= 20, plot.points=T)
+
+par(mfrow=c(1,2))
+hist(threshold$cust_penetration,prob=1,breaks=200, main = "cust_penetration impacted, all")
+lines(density(threshold$cust_penetration,kernel="gaussian"),col=2)
+
+hist(cust_penetration.less.98$cust_penetration,prob=1,breaks=100, main = "cust_penetration impacted, 98% low volume")
+lines(density(cust_penetration.less.98$cust_penetration,kernel="gaussian"),col=2)
+
+
+summary(cust_penetration.less.98$cust_penetration)
+
+densityplot(~ cust_penetration | div_nm, cust_penetration.less.98, pch= 20, plot.points=FALSE)
+
+#cust_penetration.threshold=ddply(cust_penetration.less.98, .(div_nm), function(x) quantile(x$cust_penetration))
+#changed to median for qty penetration
+cust_penetration.threshold=ddply(cust_penetration.less.98, .(div_nm), function(x) round(max(quantile(x$cust_penetration,.75),summary(cust_penetration.less.98$cust_penetration)[3]),5))
+colnames(cust_penetration.threshold)=c("div_nm","cust_penetration_threshold")
+
+
+
+##################################################################
+##################################################################
+#weighted_elasticity
+##################################################################
+##################################################################
+
+densityplot(~ weighted_elasticity, threshold, pch= 20, plot.points=T)
+summary(threshold$weighted_elasticity)
+
+a.weighted_elasticity=quantile(threshold$weighted_elasticity, .05,na.rm =T)
+
+
+weighted_elasticity.less.98=subset(threshold,threshold$weighted_elasticity>a.weighted_elasticity)
+
+densityplot(~ weighted_elasticity, weighted_elasticity.less.98, pch= 20, plot.points=T)
+
+par(mfrow=c(1,2))
+hist(threshold$weighted_elasticity,prob=1,breaks=200, main = "weighted_elasticity impacted, all")
+lines(density(threshold$weighted_elasticity,kernel="gaussian"),col=2)
+
+hist(weighted_elasticity.less.98$weighted_elasticity,prob=1,breaks=100, main = "weighted_elasticity impacted, 98% low volume")
+lines(density(weighted_elasticity.less.98$weighted_elasticity,kernel="gaussian"),col=2)
+
+
+summary(weighted_elasticity.less.98$weighted_elasticity)
+
+densityplot(~ weighted_elasticity | div_nm, weighted_elasticity.less.98, pch= 20, plot.points=FALSE)
+
+#weighted_elasticity.threshold=ddply(weighted_elasticity.less.98, .(div_nm), function(x) quantile(x$weighted_elasticity))
+#elasticity -1 or division 25 percentile (75 fr absolute elasticity)
+weighted_elasticity.threshold=ddply(weighted_elasticity.less.98, .(div_nm), function(x) round(min(quantile(x$weighted_elasticity,.25),-1),2))
+colnames(weighted_elasticity.threshold)=c("div_nm","weighted_elasticity_threshold")
+
+
+
+
+
+
+
+
+
+
+
+
+
+thresholds.by.market=cbind(qty.threshold,cust.cnt.threshold[,2],ttl_sales.threshold[,2],qty_penetration.threshold[,2],cust_penetration.threshold[,2])
+colnames(thresholds.by.market)=c("div_nm","qty.threshold","cust.cnt.threshold","ttl_sales.threshold","qty_penetration.threshold","cust_penetration.threshold")
+thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(weighted_elasticity.threshold), by = "div_nm")
