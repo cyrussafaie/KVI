@@ -277,6 +277,72 @@ colnames(psi_cnt.threshold)=c("div_nm","psi_cnt_threshold")
 
 
 
+##################################################################
+##################################################################
+#psi_share_of_item_in_div
+##################################################################
+##################################################################
+
+densityplot(~ psi_share_of_item_in_div, threshold, pch= 20, plot.points=T)
+summary(threshold$psi_share_of_item_in_div)
+a.psi_share_of_item_in_div=quantile(threshold$psi_share_of_item_in_div, .98,na.rm = T)
+
+
+psi_share_of_item_in_div.less.98=subset(threshold,threshold$psi_share_of_item_in_div<a.psi_share_of_item_in_div)
+
+densityplot(~ psi_share_of_item_in_div, psi_share_of_item_in_div.less.98, pch= 20, plot.points=T)
+
+par(mfrow=c(1,2))
+hist(threshold$psi_share_of_item_in_div,prob=1,breaks=200, main = "psi_share_of_item_in_div impacted, all")
+lines(density(threshold$psi_share_of_item_in_div,kernel="gaussian"),col=2)
+
+hist(psi_share_of_item_in_div.less.98$psi_share_of_item_in_div,prob=1,breaks=100, main = "psi_share_of_item_in_div impacted, 98% low volume")
+lines(density(psi_share_of_item_in_div.less.98$psi_share_of_item_in_div,kernel="gaussian"),col=2)
+
+
+summary(psi_share_of_item_in_div.less.98$psi_share_of_item_in_div)
+
+densityplot(~ psi_share_of_item_in_div | div_nm, psi_share_of_item_in_div.less.98, pch= 20, plot.points=FALSE)
+
+#psi_share_of_item_in_div.threshold=ddply(psi_share_of_item_in_div.less.98, .(div_nm), function(x) quantile(x$psi_share_of_item_in_div))
+#changed to median for qty penetration
+psi_share_of_item_in_div.threshold=ddply(psi_share_of_item_in_div.less.98, .(div_nm), function(x) round(max(quantile(x$psi_share_of_item_in_div,.75),summary(psi_share_of_item_in_div.less.98$psi_share_of_item_in_div)[4]),5))
+colnames(psi_share_of_item_in_div.threshold)=c("div_nm","psi_share_of_item_in_div_threshold")
+
+
+
+##################################################################
+##################################################################
+#lpc_chng_frequency
+##################################################################
+##################################################################
+
+densityplot(~ lpc_chng_frequency, threshold, pch= 20, plot.points=T)
+summary(threshold$lpc_chng_frequency)
+a.lpc_chng_frequency=quantile(threshold$lpc_chng_frequency, .75,na.rm = T)
+
+
+lpc_chng_frequency.less.98=subset(threshold,threshold$lpc_chng_frequency<a.lpc_chng_frequency+1)
+
+densityplot(~ lpc_chng_frequency, lpc_chng_frequency.less.98, pch= 20, plot.points=T)
+
+par(mfrow=c(1,2))
+hist(threshold$lpc_chng_frequency,prob=1,breaks=200, main = "lpc_chng_frequency impacted, all")
+lines(density(threshold$lpc_chng_frequency,kernel="gaussian"),col=2)
+
+hist(lpc_chng_frequency.less.98$lpc_chng_frequency,prob=1,breaks=100, main = "lpc_chng_frequency impacted, 98% low volume")
+lines(density(lpc_chng_frequency.less.98$lpc_chng_frequency,kernel="gaussian"),col=2)
+
+
+summary(lpc_chng_frequency.less.98$lpc_chng_frequency)
+
+densityplot(~ lpc_chng_frequency | div_nm, lpc_chng_frequency.less.98, pch= 20, plot.points=FALSE)
+
+#lpc_chng_frequency.threshold=ddply(threshold, .(div_nm), function(x) quantile(x$lpc_chng_frequency,.75))
+#changed to median for qty penetration
+lpc_chng_frequency.threshold=ddply(threshold, .(div_nm), function(x) quantile(x$lpc_chng_frequency,.75))
+colnames(lpc_chng_frequency.threshold)=c("div_nm","lpc_chng_frequency_threshold")
+
 
 
 
@@ -287,4 +353,7 @@ thresholds.by.market=cbind(qty.threshold,cust.cnt.threshold[,2],ttl_sales.thresh
 colnames(thresholds.by.market)=c("div_nm","qty.threshold","cust.cnt.threshold","ttl_sales.threshold","qty_penetration.threshold","cust_penetration.threshold")
 thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(weighted_elasticity.threshold), by = "div_nm")
 thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(psi_cnt.threshold), by = "div_nm")
+thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(psi_share_of_item_in_div.threshold), by = "div_nm")
+thresholds.by.market=cbind(thresholds.by.market,lpc_chng_frequency_threshold=lpc_chng_frequency.threshold[,2])
 
+write.csv(thresholds.by.market,"threshold_v1.csv",row.names = F)
