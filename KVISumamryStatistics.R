@@ -357,3 +357,11 @@ thresholds.by.market <- join( as.data.frame(thresholds.by.market),as.data.frame(
 thresholds.by.market=cbind(thresholds.by.market,lpc_chng_frequency_threshold=lpc_chng_frequency.threshold[,2])
 
 write.csv(thresholds.by.market,"threshold_v1.csv",row.names = F)
+
+
+final.desig=read.csv("final_designation.csv")
+dim(final.desig)
+names(final.desig)
+final.desig.threshold=ddply(final.desig, .(div_nm), function(x) cbind(quantile(x$Sum,.95),quantile(x$Sum,.97),quantile(x$Sum,.99)))
+colnames(final.desig.threshold)=c("div_nm","95%","97%","99%")
+write.csv(final.desig.threshold,"sum.threshold.csv",row.names = F)
