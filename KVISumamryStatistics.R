@@ -365,3 +365,12 @@ names(final.desig)
 final.desig.threshold=ddply(final.desig, .(div_nm), function(x) cbind(quantile(x$Sum,.95),quantile(x$Sum,.97),quantile(x$Sum,.99)))
 colnames(final.desig.threshold)=c("div_nm","95%","97%","99%")
 write.csv(final.desig.threshold,"sum.threshold.csv",row.names = F)
+
+
+
+crossing=read.csv("final_list_for_crossing.csv")
+names(crossing)
+table(current=crossing$cmdty_ind,suggetsed=crossing$com_flag_Suggested)
+prop.table(crossing$cmdty_ind,crossing$com_flag_Suggested)
+
+
