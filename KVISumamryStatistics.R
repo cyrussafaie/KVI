@@ -374,3 +374,15 @@ table(current=crossing$cmdty_ind,suggetsed=crossing$com_flag_Suggested)
 prop.table(crossing$cmdty_ind,crossing$com_flag_Suggested)
 
 
+
+#####################################################
+#####################################################
+# no volume score by market
+#####################################################
+#####################################################
+noVolumeScore=read.csv("no_volume_score.csv")
+names(noVolumeScore)
+library(plyr)
+noVolumeScore.threshold=ddply(noVolumeScore, .(div_nm), function(x) cbind(quantile(x$No.volume.score,.95),quantile(x$No.volume.score,.97),quantile(x$No.volume.score,.99)))
+colnames(noVolumeScore.threshold)=c("div_nm","95%","97%","99%")
+write.csv(noVolumeScore.threshold,"no.volume.threshold.csv",row.names = F)
